@@ -1,0 +1,73 @@
+---
+title: "My First Analysis"
+author: "Mayank"
+date: "2023-09-01"
+output:
+  html_document: default
+  pdf_document: default
+---
+```{r, echo=TRUE}
+library(ggplot2)
+attach(diamonds)
+?ggplot
+
+ggplot(diamonds)
+```
+
+
+
+```{r}
+ggplot(diamonds)+
+  geom_point(aes(carat,price, colour = cut))
+ggplot(diamonds)+
+  geom_point(aes(carat,price), colour = "PINK")
+ggplot(diamonds)+
+  geom_point(aes(carat,price, colour = color, size = cut))
+```
+
+```{r}
+hist(diamonds$price,probability = T, main="")
+```
+
+```{r}
+ggplot(diamonds)+
+  geom_point(aes(carat,price, colour = color, size = cut))+
+  scale_x_log10()+
+  scale_y_log10()
+
+ggplot(diamonds)+
+  geom_point(aes(carat,price, colour = color, size = cut))+
+  coord_trans(y="log", x="log")
+
+ggplot(diamonds)+
+  geom_point(aes(carat,price, colour = color))+
+  coord_trans(y="log", x="log")
+```
+## Abstract
+
+## Introduction
+Half page talking about the problem and from where the dataset is collected 
+
+## Data Set Description
+How many samples row columns and variables names 
+dataset description
+
+## Exploratory data analysis
+# NO CODE ONLY GRAPHS
+
+
+## Conclusion
+
+$$
+y_i = \alpha_i+\beta_i x, ~~~i=1,2,3,\dots,n
+$$
+## Lecture-4
+```{r, echo=FALSE}
+n = nrow(diamonds)
+hist(diamonds$price, probablity=T, main="")
+
+```
+
+
+
+
