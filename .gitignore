@@ -1,7 +1,14 @@
+FirstApp
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
 First-Analysis_files
-report
 src
+.gitignore
+BDCC-06-00139-v2.pdf
+Bengaluru_House_Data_clean.RData
+First Analysis.Rmd
+First-Analysis.html
+First-Analysis.pdf
+TA-Sessions.R

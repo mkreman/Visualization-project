@@ -1,0 +1,244 @@
+---
+title: "Exploratory Data Analysis of Lung Cancer Dataset"
+author: "Mayank Nagar"
+date: \today
+output: pdf_document
+---
+
+```{r ReadingData,echo=FALSE, message=FALSE}
+options(warn = -1)
+library(ggplot2)
+df = read.csv('./../db/survey lung cancer.csv')
+```
+
+# Introduction
+
+Lung cancer remains a global health concern. While numerous studies have been done on the association between smoking and lung cancer, the role of other lifestyle factors, such as fatigue, chest pain, and alcohol consumption, in lung cancer risk remains less explored. This study aims to investigate the relation between these variables in lung cancer dataset.
+
+Our dataset includes information on allergies, wheezing, present of fatigue, and present of chest pain, and alcohol consumption and many more symptoms among individuals with and without lung cancer. Through rigorous statistical analysis and graphs, we want to explain the potential relationships between these symptoms/lifestyle factors and lung cancer risk.
+
+Conducting this kind of study helps people learn about their chances of getting cancer without spending a lot of money. It also enables them to make better decisions based on their individual cancer risk. This knowledge can lead to taking actions like getting regular check-ups and making lifestyle changes that can keep them healthier.
+
+
+# Data Set Description
+
+The data is collected from the \href{https://www.kaggle.com/datasets/mysarahmadbhat/lung-cancer}{\textcolor{blue}{Kaggle}} and published in the consequence of the study, "Dritsas, Elias, and Maria Trigka. 2022."Lung Cancer Risk Prediction with Machine Learning Models" Big Data and Cognitive Computing 6, no. 4: 139. \href{https://doi.org/10.3390/bdcc6040139}{\textcolor{blue}{https://doi.org/10.3390/bdcc6040139}}". In this study authors purposed machine learning methodologies to predict lung cancer based on most common habits and symptoms/signs as input features to the models.
+
+Checking how many rows are duplicated
+```{r,echo=TRUE}
+sum(duplicated(df))
+```
+There are $33$ individual for which has all same attributes.
+
+```{r,echo=TRUE}
+dim(df)
+```
+The dataset has 309 rows and 16 columns and contains following columns.
+
+```{r,echo=TRUE}
+knitr::kable(colnames(df))
+```
+Two columns have categorical values namely `GENDER` and `LUNG_CANCER` and rest 14 have numerical values.
+
+
+A brief detail about the features in the dataset:
+
+1.  GENDER column contains **M** for Male and **F** for Female
+
+2.  AGE column contains the age of the participant and its a numerical value
+
+3.  SMOKING columns contains 1 for non smoker and 2 for smoker participant
+
+4.  YELLOW_FINGERS column contains 1 for the person who doesn't have yellow fingers and 2 for the person who has yellow fingers
+
+5.  ANXIETY column contains 1 for the person who does not have anxiety and 2 for the person who has anxiety
+
+6.  PEER_PRESSURE column contains 1 for the person who is not facing peer pressure and 2 for the function who is facing peer pressure
+
+7.  CHRONIC.DISEASE column contains 2 for the person who has some chronic disease otherwise 1.
+
+8.  FATIGUE column contains 2 for the person who feels usually tiredness or lack of energy otherwise 1.
+
+9.  ALLERGY column contains 1 for the person who does not have any kind of allergies otherwise 2.
+
+10. WHEEZING column contains 2 for the person who feels wheezing while breathing otherwise 1.
+
+11. ALCOHOL.CONSUMING column contains 2 for the person who consumes alcohol otherwise 1.
+
+12. COUGHING column contains 2 for the person who has problem of coughing otherwise 1.
+
+13. SHORTNESS.OF.BREATH column contains 2 for the person who has the problem of shortness of breath otherwise 1.
+
+14. SWALLOWING.DIFFICULTY column contains 2 for the person who has difficulty swallowing otherwise 1.
+
+15. CHEST.PAIN column contains 2 for the person who has chest pain otherwise 1.
+
+16. LUNG_CANCER column contains **YES** for the person who has the lung cancer otherwise **NO**.
+
+# Exploratory data analysis
+
+```{r hi, echo=FALSE, warning=FALSE, message=FALSE, fig.height=4}
+ggplot(df, aes(x=AGE, color=LUNG_CANCER)) + 
+  geom_histogram(fill='lightblue', aes(y=..density.., bins=30)) + 
+  geom_density(alpha=0.0, fill='#FF0000') + 
+  scale_x_continuous(breaks = seq(min(df$AGE)-1, max(df$AGE), by = 10)) + 
+  labs(x = "Age", y = "Density", title = 'Stacked histogram of Age given the Lung cancer') + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+Based on the stacked histogram, we can observe that the most frequent age range among individuals falls between 50 and 75 years, with the youngest individual being 21 years old and the oldest being 87 years old.
+
+```{r,echo=FALSE, fig.height=4}
+ggplot(df, aes(x = GENDER, y = AGE, color=LUNG_CANCER)) +
+  geom_boxplot() + 
+  ggtitle('Boxplot Between GENDER and AGE') + 
+  labs(x = "Gender of Individual", y = "Age",
+       title = 'Grouped Barplot between Gender and Age given the Lung cancer') + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+On the x-axis `F` stand for `Female` and `M` is for `Male`. There are some outliers present in dataset. The lung cancer is present comparatively in higher age group. Female patients with no cancer are comparatively belong to lower age group.
+
+To identify which features are significant contributors to lung cancer, information gain is computed for each feature with respect to LUNG_CANCER column. Information gain measure the entropy loss of the dataset if we split the dataset based on the feature.
+
+$$I.G.(S, X)=\frac{1}{Entropy(X)}\left[Entropy(S)-\sum_{v \in X}\frac{|S_v|}{|S|}Entropy(S_v)\right]$$ 
+Where $I.G.(S,X)$ is information gain of the feature $X$ in the dataset $S$. $|S|$ is number of elements in $S$. The formula for entropy is 
+$$Entropy(X)=\sum_{i=class(X)}-P_i\log_2(P_i)$$ 
+Where $P_i$ is the observable probability of the class $i$ in feature $X$.
+
+We get the following results:
+
+```{r, echo=FALSE, warning=FALSE, error=FALSE, message=FALSE}
+library(magrittr) # needs to be run every time you start R and want to use %>%
+library(dplyr)
+
+entropy <- function(target){
+  freq <- table(target)/length(target)
+  # vectorize
+  vec <- as.data.frame(freq)[,2]
+  #drop 0 to avoid NaN resulting from log2
+  vec<-vec[vec>0]
+  #compute entropy
+  -sum(vec * log2(vec))
+}
+
+IG_cat<-function(data,feature,target){
+  #Strip out rows where feature is NA
+  data<-data[!is.na(data[,feature]),] 
+  #use dplyr to compute e and p for each value of the feature
+  dd_data <- data %>% group_by_at(feature) %>% summarise(e=entropy(get(target)), 
+                                                         n=length(get(target)))
+  
+  #compute entropy for the parent
+  e0<-entropy(data[,target])
+  #calculate p for each value of feature
+  dd_data$p<-dd_data$n/nrow(data)
+  
+  hfi = entropy(data[,feature])
+  
+  #compute IG
+  IG <- (e0-sum(dd_data$p*dd_data$e))/hfi
+}
+
+information_gain = data.frame(column = colnames(df)[-16], information=c(1:15))
+i = 1
+for(col in colnames(df)){
+  if(col != 'LUNG_CANCER'){
+    information_gain$information[i] = IG_cat(df, col, 'LUNG_CANCER')
+  }
+  i <- i + 1
+}
+
+# information_gain
+res = information_gain[order(information_gain$information,decreasing = TRUE),]
+rownames(res) = c(1:15)
+# res
+
+res$column <- factor(res$column, levels=res$column[order(res$information, decreasing=TRUE)])
+
+ggplot(res, aes(x=column, y=information)) + 
+  geom_bar(stat="identity", fill='steelblue') + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  labs(x = "Features", y = "Information Gain", title = 'Barplot of Information Gain of features') + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+From the graph, it is clear that the variables `Allergy` and `Alcohol Consuming` provide significantly higher information gain in comparison to `Smoking`. This finding is surprising.
+
+To verify these findings, we will create stacked barplot of individual feature with respect to lung cancer. 
+However, before preceeding, examine the data skewness respect to `Lung Cancer`.
+
+```{r, echo=FALSE, warning=FALSE, fig.height=3.50, fig.width=6}
+lc_freq = as.data.frame(table(df[,'LUNG_CANCER']))
+
+ggplot(lc_freq, aes(x=Var1, y=Freq)) + 
+  geom_bar(stat = "identity", fill='steelblue') +
+  geom_text(aes(label = Freq), vjust = -0.15) +
+  labs(x = "Lung Cancer Presence", y = "Count", title = "Barplot of Lung Cancer") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+We observe a significant skew in the data, consisting of 39 rows of participants without lung cancer and 270 rows of participants with lung cancer. Consequently, creating a stacked bar plot of features respect to lung cancer may not give meaningful insights.
+
+Hence, a bar plot displaying the ratio of each feature is generated given the lung cancer status.
+
+```{r,echo=FALSE}
+bar.graph <- function(variable, a, b, title){
+  data = c(sum(df['LUNG_CANCER']=='YES' & df[variable] == '1') / sum(df['LUNG_CANCER']=='YES'),
+           sum(df['LUNG_CANCER']=='NO' & df[variable] == '1') / sum(df['LUNG_CANCER']=='NO'),
+           sum(df['LUNG_CANCER']=='YES' & df[variable] == '2') / sum(df['LUNG_CANCER']=='YES'),
+           sum(df['LUNG_CANCER']=='NO' & df[variable] == '2') / sum(df['LUNG_CANCER']=='NO'))
+  
+  al.freq = data.frame(Symptom = rep(c(a, b), each=2),
+                       variable=rep(c('Lung Cancer', 'No Lung cancer'), times=2),
+                       Value=as.vector(data))
+  
+  p <- ggplot(al.freq, aes(x = variable , y = Value, fill = Symptom)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    labs(x = "", y = "Probabilities", title = title) +
+    geom_text(aes(label=round(Value, 2)), vjust=-0.5, size=4, hjust=0.5,
+              position=position_dodge(width = 0.9)) +
+    theme(plot.title = element_text(hjust = 0.5))
+  return(p)
+}
+```
+
+```{r,echo=FALSE, out.width='50%'}
+print(bar.graph('ALLERGY', 'Non-Allergic', 'Allergic', title='Barplot of Probabilities of Allergy'))
+print(bar.graph('ALCOHOL.CONSUMING', 'Non-Alcoholic', 'Alcoholic', title='Barplot of Probabilities of Alcohol Consuming'))
+```
+  
+```{r,echo=FALSE, out.width='50%'}
+print(bar.graph('SMOKING', 'Non-Smoker', 'Smoker', title='Barplot of Probabilities of Smoking'))
+print(bar.graph('SHORTNESS.OF.BREATH', 'No Shortness of Breath', 'Shortness of Breath', title='Barplot of Probabilities of Shortness of Breath'))
+```
+From the graphs, followings can be concluded:
+
+- Among individuals without lung cancer, $87\%$ have no allergies, whereas among those with lung cancer, $62\%$ have allergies.
+
+- Among individuals without lung cancer, $82\%$ are non-alcoholic, whereas among those with lung cancer, $61\%$ are alcoholic.
+
+- Among individuals without lung cancer, almost half are non smoker, whereas among those with lung cancer, $57\%$ are smoker.
+
+- Among individuals without lung cancer, $56\%$ have shortness of breath, whereas among those with lung cancer, $65\%$ have shortness of breath.
+
+Therefore, `Allergy` and `Alcohol` emerge as a more prominent features associated with lung cancer compared to `Smoking` and `Shortness of Breath`.
+
+# Result
+Based on the exploratory data analysis, we can draw the following conclusions:
+
+- Most participants fall within the age group of $50$ to $70$ years.
+
+- Lung cancer is more common in older age groups, while female patients without cancer tend to belong to relatively younger age groups.
+
+- The statistical measure "Information Gain" yields surprising insights into the dataset. Features like `Allergy`, `Alcohol Consuming`, `Swallowing Difficulty`, `Wheezing`, and `Coughing` appear to be more significant for predicting Lung Cancer compared to features like `Smoking`, `Shortness of Breath`, and `Chest Pain`.
+
+- The dataset shows an imbalance concerning the Lung Cancer feature, with only $39$ participants without lung cancer and $270$ participants with lung cancer.
+
+- Among individuals without lung cancer, $87\%$ have no allergies, while among those with lung cancer, $62\%$ have allergies. Regarding alcohol consumption, $82\%$ of non-alcoholics are in the non-lung cancer group, compared to $61\%$ of alcoholics in the lung cancer group. Almost half of non-smokers belong to the non-lung cancer group, while $57\%$ of smokers are in the lung cancer group. Furthermore, $56\%$ of individuals without lung cancer experience shortness of breath, whereas $65\%$ of those with lung cancer report the same symptom.
+
+# Conclusion
+This study provides evidence of some common misconceptions about the leading causes of lung cancer. Smoking and chest pain are not the primary factors contributing to lung cancer. Instead, the findings emphasize the significance of other variables such as allergies and alcohol consumption in determining an individual’s risk of developing lung cancer.
+
+These findings shows how important it is to live a healthier life and making positive choices in daily habits. Maintaining a lifestyle that reduces risk factors like smoking and excessive alcohol consumption can significantly impact one's overall health and well-being. Recognizing the early signs and symptoms associated with lung cancer, such as shortness of breath or persistent coughing, should prompt individuals to seek medical assistance promptly.
+
+Regular checkups and screenings provide opportunities for early detection, which can be helpful in improving health outcomes. By paying attention to these findings and making informed choices, individuals can take meaningful steps toward reducing their risk of lung cancer and promoting their overall health and longevity.
