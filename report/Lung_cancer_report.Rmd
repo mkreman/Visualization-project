@@ -9,6 +9,8 @@ output: pdf_document
 options(warn = -1)
 library(ggplot2)
 df = read.csv('./../db/survey lung cancer.csv')
+df['GENDER'][df['GENDER']=='F'] = '1'
+df['GENDER'][df['GENDER']=='M'] = '2'
 ```
 
 # Introduction
@@ -77,9 +79,9 @@ A brief detail about the features in the dataset:
 
 # Exploratory data analysis
 
-```{r hi, echo=FALSE, warning=FALSE, message=FALSE, fig.height=4}
+```{r hi, echo=FALSE, fig.height=4}
 ggplot(df, aes(x=AGE, color=LUNG_CANCER)) + 
-  geom_histogram(fill='lightblue', aes(y=..density.., bins=30)) + 
+  geom_histogram(fill='lightblue', aes(y=..density..), bins=30) + 
   geom_density(alpha=0.0, fill='#FF0000') + 
   scale_x_continuous(breaks = seq(min(df$AGE)-1, max(df$AGE), by = 10)) + 
   labs(x = "Age", y = "Density", title = 'Stacked histogram of Age given the Lung cancer') + 
@@ -88,11 +90,11 @@ ggplot(df, aes(x=AGE, color=LUNG_CANCER)) +
 Based on the stacked histogram, we can observe that the most frequent age range among individuals falls between 50 and 75 years, with the youngest individual being 21 years old and the oldest being 87 years old.
 
 ```{r,echo=FALSE, fig.height=4}
-ggplot(df, aes(x = GENDER, y = AGE, color=LUNG_CANCER)) +
+ggplot(df, aes(y = AGE, color=LUNG_CANCER)) +
   geom_boxplot() + 
   ggtitle('Boxplot Between GENDER and AGE') + 
   labs(x = "Gender of Individual", y = "Age",
-       title = 'Grouped Barplot between Gender and Age given the Lung cancer') + 
+       title = 'Grouped Boxplot between Gender and Age given the Lung cancer') + 
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
