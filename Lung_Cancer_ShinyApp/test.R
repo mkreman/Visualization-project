@@ -1,22 +1,18 @@
-library(shiny)
-library(shinydashboard)
+# app.R
 
-ui <- dashboardPage(
-  dashboardHeader(title = "Local Image Viewer"),
-  dashboardSidebar(),
-  dashboardBody(
-    fluidRow(
-      box(
-        title = "Local Image",
-        width = 6,
-        img(src = "s", width = "100%")
-      )
-    )
-  )
+# Load necessary libraries
+library(shiny)
+
+# Shiny app UI
+ui <- fluidPage(
+  # Use HTML tags to display the image
+  HTML('<img src="www/IMG_0349.png" width="100%" height="auto" />')
 )
 
-server <- function(input, output, session) {
-  # Your server logic (if any) goes here
+# Shiny app server (placeholder server function)
+server <- function(input, output) {
+  # Your server logic goes here
 }
 
+# Run the Shiny app
 shinyApp(ui, server)

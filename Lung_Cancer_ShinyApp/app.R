@@ -43,10 +43,13 @@ ui <- dashboardPage(
   dashboardBody(
     tabItems(
       tabItem(tabName = "home",
-#               box(fluidRow(column(12, h3('Lung cancer remains a global health concern. While numerous studies have been done on the association
-# between smoking and lung cancer, the role of other lifestyle factors, such as fatigue, chest pain, and alcohol
-# consumption, in lung cancer risk remains less explored.')))),
-              fluidRow(column(5, imageOutput("img1"))),
+              HTML('<h1 style="font-family: Times New Roman, sans-serif; font-weight: bold; color: #3c8dbc; text-align: center;"
+                   >Welcome to Lung Cancer Dataset Dashborad</h1>'),
+              
+              fluidRow(div(
+                style = "display: flex; justify-content: center; align-items: center; height: 40vh;",
+                img(src = "https://github.com/nagar-mayank/Visualization-project/blob/main/Lung_Cancer_ShinyApp/www/IMG_0349.JPG?raw=true",
+                                      height = "250px", width = "350px"))),
 
               # fluidRow(column(12, plotOutput('age_dist')))
               ),
@@ -66,7 +69,7 @@ ui <- dashboardPage(
 server <- function(input, output) {
   
   output$img1 = renderImage({
-    list(src = "www/IMG_3049.jpg", width = "600px", height = "300px")},deleteFile=F)
+    list(src = "https://github.com/nagar-mayank/Visualization-project/blob/main/Lung_Cancer_ShinyApp/www/IMG_0349.JPG?raw=true", width = "600px", height = "300px")},deleteFile=F)
   
   output$age_dist <- renderPlot({
     ggplot(df, aes(x=AGE, color=LUNG_CANCER)) + 
