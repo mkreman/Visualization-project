@@ -19,6 +19,9 @@ library(ggplot2)
 library(dplyr) 
 
 
+###############################
+
+
 count.data <- data.frame( 
   pilot_class = c(col, paste('Non-', col)), 
   n = c(length(df[col][df['LUNG_CANCER'] == 'YES']), length(df[col][df['LUNG_CANCER'] == 'NO'])), 
@@ -58,3 +61,10 @@ ggplot(data, aes(x = "", y = value, fill = category)) +
   theme_minimal() +
   ggtitle("Pie Chart Example")
 
+#############################
+ggplot(df, aes(y = AGE, color=col)) +
+  geom_boxplot() + 
+  ggtitle('Boxplot Between GENDER and AGE') + 
+  labs(x = "Gender of Individual", y = "Age",
+       title = 'Grouped Boxplot between Gender and Age given the Lung cancer') + 
+  theme(plot.title = element_text(hjust = 0.5))

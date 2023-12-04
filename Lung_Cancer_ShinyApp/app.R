@@ -85,7 +85,7 @@ ui <- dashboardPage(
 server <- function(input, output) {
   
   output$img1 = renderImage({
-    list(src = "https://github.com/nagar-mayank/Visualization-project/blob/main/Lung_Cancer_ShinyApp/www/IMG_0349.JPG?raw=true", width = "600px", height = "300px")},deleteFile=F)
+    list(src = "https://github.com/nagar-mayank/Visualization-project/blob/main/Lung_Cancer_ShinyApp/www/image1.png?raw=true", width = "600px", height = "300px")},deleteFile=F)
   
   output$age_dist <- renderPlot({
     ggplot(df, aes(x=AGE, color=LUNG_CANCER)) + 
