@@ -4,9 +4,9 @@ FirstApp
 .RData
 .Ruserdata
 First-Analysis_files
-Lung_Cancer_ShinyApp/links.txt
-Lung_Cancer_ShinyApp/test.R
-Lung_Cancer_ShinyApp/test1.R
+links.txt
+test.R
+test1.R
 src
 .gitignore
 BDCC-06-00139-v2.pdf

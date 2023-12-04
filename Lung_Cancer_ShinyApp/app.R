@@ -36,8 +36,8 @@ ui <- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Home", tabName = "home", icon = icon("home")),
-      menuItem("Graphs", tabName = "Graphs", icon = icon("th")),
-      menuItem("Information Gain", tabName = "inf_gain", icon = icon("th"))
+      menuItem("Data Analysis", tabName = "Graphs", icon = icon("th")),
+      menuItem("Information Gain", tabName = "inf_gain", icon = icon("circle-info"))
     )
   ),
   dashboardBody(
@@ -48,7 +48,7 @@ ui <- dashboardPage(
               
               fluidRow(div(
                 style = "display: flex; justify-content: center; align-items: center; height: 36vh;",
-                img(src = "https://github.com/nagar-mayank/Visualization-project/blob/main/Lung_Cancer_ShinyApp/www/image1.png?raw=true",
+                img(src = "image1.png",
                                       height = "250px", width = "350px"))),
               HTML('<p style="font-family: Times New Roman; font-size: 25px; margin-left: 20px;"
                    >Lung cancer continues to pose a significant global health challenge. While extensive research has delved
@@ -61,26 +61,46 @@ ui <- dashboardPage(
                    target='_blank'>Kaggle</a>, calculating the information gain for each feature.
                    The analysis reveals that `ALLERGY` exhibits the highest information gain, while `SMOKING` demonstrates the 
                    least. This unexpected outcome is visually represented in the Information Gain section of the Dashboard, showcasing
-                   IG values for better insight.</p>"),
+                   IG values for better insight.</p>")
               ),
       # Code for 'Graph' Page
       tabItem(tabName = "Graphs",
+              HTML("<h1 style='font-family: Times New Roman; font-size: 25px; margin-left: 0px;font-weight: bold;color: #3c8dbc'
+                   >Data Analysis of Lung Cancer Dataset
+                   </h1>"),
+              HTML("<p style='font-family: Times New Roman; font-size: 20px; margin-left: 0px;'
+                   >The initial graph displays a boxplot depicting the distribution of ages concerning the selected variable.
+                   The second graph illustrates the count of patients with or without the specified symptom.
+                   </p>"),
               fluidRow(column(5, selectInput("graph_var", "Select a variable:", choices = res$column, selected = res$column[1]))),
               
               box(title = "Grouped Boxplot of Age given the variable", status = "primary", solidHeader = TRUE,
-                  fluidRow(column(12, plotOutput('stacked_boxplot', width='100%')))),
+                  fluidRow(column(12, plotOutput('grouped_boxplot', width='100%')))),
               
               box(title = "Barplot showing distribution of the variable", status = "primary", solidHeader = TRUE,
-                  fluidRow(column(12, plotOutput('barplot', width='100%'))))
-      ),
+                  fluidRow(column(12, plotOutput('barplot', width='100%')))),
+              
+              ),
       
       # Code for 'Information Gain' Page
       tabItem(tabName = "inf_gain",
+              HTML("<h1 style='font-family: Times New Roman; font-size: 25px; margin-left: 20px;font-weight: bold;color: #3c8dbc'
+                   >Information Gain and Observed ratios 
+                   </h1>"),
+              HTML("<p style='font-family: Times New Roman; font-size: 20px; margin-left: 20px;'
+                   >First graph show the information gain calculated for each variable and the second plot present a
+                   barplot Illustrating the Ratio of Each Feature Given the Lung Cancer Status.
+                   </p>"),
               box(title = "Information Gain of each variable", status = "primary", solidHeader = TRUE,
-                fluidRow(column(12, plotOutput('information_grain_plot', height = "380px", width = "100%")))),
-              box(title = "Barplot of Information Gain of a variable", status = "primary", solidHeader = TRUE,
-                fluidRow(column(4, selectInput("variable", "Select a variable:", choices = res$column, selected = res$column[1]))),
-                fluidRow(column(8, plotOutput('prob_barplot', height = "300px", width = "500px"))))
+                fluidRow(column(12, plotOutput('information_grain_plot', height = "400px", width = "100%")))),
+              
+              box(title = "Barplot of the Ratio of Lung Cancer Patients Across Variable Categories", status = "primary", solidHeader = TRUE,
+                fluidRow(column(5, selectInput("variable", "Select a variable:", choices = data.frame(column=res$column)%>% filter(column != "AGE"), selected = res$column[1]))),
+                fluidRow(column(12, plotOutput('prob_barplot', height = "320px", width = "100%")))),
+              column(12, HTML("<p style='font-family: Times New Roman; font-size: 20px; margin-left: 20px;'
+                   >From the presented graph, it is evident that `Allergy` and `Alcohol Consumption` stand out
+                   as more prominent features linked to lung cancer in comparison to Smoking and Shortness of Breath.
+                   </p>")),
               )
       )
     )
@@ -88,6 +108,21 @@ ui <- dashboardPage(
 
 
 server <- function(input, output) {
+  # Graphs for page Graphs
+  output$grouped_boxplot <- renderPlot({
+    ggplot(df1, aes(y = AGE, color = !!sym(input$graph_var))) +
+      geom_boxplot() + 
+      labs(y = "Age", title = '') + 
+      theme(plot.title = element_text(hjust = 0.5))
+  })
+  
+  output$barplot <- renderPlot({
+    ggplot(df1, aes(x = get(input$graph_var))) +
+      geom_bar(fill = "#0073C2FF", color = "black", alpha = 0.7) +
+      labs(x = input$graph_var, y = "Count", title = '') +
+      theme_minimal()
+  })
+
   output$information_grain_plot <- renderPlot({
     ggplot(res, aes(x=column, y=information)) + 
       geom_bar(stat="identity", fill='steelblue') + 
@@ -99,22 +134,6 @@ server <- function(input, output) {
   output$prob_barplot <- renderPlot({
     bar.graph(input$variable, paste('Non', input$variable, sep='-'), input$variable)
   })
-  
-  output$stacked_boxplot <- renderPlot({
-    ggplot(df1, aes(y = AGE, color = !!sym(input$graph_var))) +
-      geom_boxplot() + 
-      labs(y = "Age",
-           title = '') + 
-      theme(plot.title = element_text(hjust = 0.5))
-  })
-  
-  output$barplot <- renderPlot({
-    ggplot(df1, aes(x = get(input$graph_var))) +
-      geom_bar(fill = "#0073C2FF", color = "black", alpha = 0.7) +
-      labs(x = input$graph_var, y = "Count", title = '') +
-      theme_minimal()
-  })
-  
 }
 
 

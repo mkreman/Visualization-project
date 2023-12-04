@@ -93,8 +93,8 @@ Based on the stacked histogram, we can observe that the most frequent age range 
 ggplot(df, aes(y = AGE, color=LUNG_CANCER)) +
   geom_boxplot() + 
   ggtitle('Boxplot Between GENDER and AGE') + 
-  labs(x = "Gender of Individual", y = "Age",
-       title = 'Grouped Boxplot between Gender and Age given the Lung cancer') + 
+  labs(x = "", y = "Age",
+       title = 'Grouped Boxplot between Age given the Lung cancer') + 
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
