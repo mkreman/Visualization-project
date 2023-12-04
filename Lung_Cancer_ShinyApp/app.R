@@ -37,7 +37,8 @@ ui <- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Home", tabName = "home", icon = icon("home")),
-      menuItem("Graphs", tabName = "Graphs", icon = icon("th"))
+      menuItem("Graphs", tabName = "Graphs", icon = icon("th")),
+      menuItem("Information Gain", tabName = "inf_gain", icon = icon("th"))
     )
   ),
   dashboardBody(
@@ -47,14 +48,29 @@ ui <- dashboardPage(
                    >Welcome to Lung Cancer Dataset Dashborad</h1>'),
               
               fluidRow(div(
-                style = "display: flex; justify-content: center; align-items: center; height: 40vh;",
-                img(src = "https://github.com/nagar-mayank/Visualization-project/blob/main/Lung_Cancer_ShinyApp/www/IMG_0349.JPG?raw=true",
+                style = "display: flex; justify-content: center; align-items: center; height: 36vh;",
+                img(src = "https://github.com/nagar-mayank/Visualization-project/blob/main/Lung_Cancer_ShinyApp/www/IMG_0349-removebg-preview.png?raw=true",
                                       height = "250px", width = "350px"))),
-
-              # fluidRow(column(12, plotOutput('age_dist')))
+              HTML('<p style="font-family: Times New Roman; font-size: 25px; margin-left: 20px;"
+                   >Lung cancer continues to pose a significant global health challenge. While extensive research has delved
+                   into the connection between smoking and lung cancer, the impact of other lifestyle factors, including
+                   fatigue, chest pain, and alcohol consumption, on lung cancer risk has received comparatively less attention.
+                   This dashboard highlights the substantial role played by these factors in influencing the risk of lung cancer.</p>'),
+              
+              HTML("<p style='font-family: Times New Roman; font-size: 25px; margin-left: 20px;'
+                   >I've utilized the lung cancer dataset sourced from <a href='https://www.kaggle.com/datasets/mysarahmadbhat/lung-cancer'
+                   target='_blank'>Kaggle</a>, calculating the information gain for each feature.
+                   The analysis reveals that `ALLERGY` exhibits the highest information gain, while `SMOKING` demonstrates the 
+                   least. This unexpected outcome is visually represented in the Graph section of the Dashboard, showcasing
+                   information gain values for better insight.</p>"),
               ),
       
       tabItem(tabName = "Graphs",
+              box(title = "Plot 1", status = "primary", solidHeader = TRUE,
+                  fluidRow(column(4, selectInput("barplot_var", "Select a variable:", choices = res$column, selected = res$column[1]))),
+                  fluidRow(column(8, plotOutput('var_barplot', height = "300px", width = "500px"))))
+      ),
+      tabItem(tabName = "inf_gain",
               box(title = "Information Gain Plot", status = "primary", solidHeader = TRUE,
                 fluidRow(column(12, plotOutput('information_grain_plot', height = "380px", width = "100%")))),
               box(title = "Plot 1", status = "primary", solidHeader = TRUE,
@@ -90,6 +106,14 @@ server <- function(input, output) {
   
   output$prob_barplot <- renderPlot({
     bar.graph(input$variable, paste('Non', input$variable, sep='-'), input$variable, title=paste('Barplot of Probabilities of', input$variable))
+  })
+  
+  output$var_barplot <- renderPlot({
+    ggplot(res, aes(y=input$barplot_var)) + 
+      geom_bar(stat="identity", fill='steelblue') + 
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+      labs(x = "Feature", y = "Frequency", title = 'Barplot of frequency of variable') + 
+      theme(plot.title = element_text(hjust = 0.5))
   })
 }
 
