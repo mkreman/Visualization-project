@@ -5,6 +5,6 @@ account: mkreman
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 10710563
-bundleId: 8004867
+bundleId: 8008703
 url: https://mkreman.shinyapps.io/lung_cancer_shinyapp/
 version: 1
