@@ -140,10 +140,14 @@ server <- function(input, output) {
   })
   
   output$barplot <- renderPlot({
-    ggplot(df, aes(x = get(input$graph_var), fill=get(input$graph_var))) +
-      geom_bar() +
+    graph <- ggplot(df, aes(x = get(input$graph_var), fill=get(input$graph_var))) +
+      geom_bar(stat='count') +
       labs(x = input$graph_var, y = "Count", title = '') +
       scale_fill_manual(name = input$graph_var, values = c('#f8766d', '#3c8dbc'))
+    
+    if(input$graph_var=='AGE'){graph}else{graph +
+      geom_text(stat='count', aes(label=..count..), vjust=-0.5, size=4, hjust=0.5,
+                position=position_dodge(width = 0.9))}
     
   })
   
